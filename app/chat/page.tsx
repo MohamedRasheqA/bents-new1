@@ -1438,15 +1438,7 @@ export default function ChatPage() {
               onNewConversation={handleNewConversation}
             />
 
-            {/* Place the Processing Card directly after the Header */}
-            {isLoading && !isStreaming && (
-              <ProcessingCard
-                query={processingQuery}
-                loadingProgress={loadingProgress}
-                setLoadingProgress={setLoadingProgress}
-              />
-            )}
-
+            {/* Only render ProcessingCard in renderConversations */}
             <div className="flex-grow w-full flex flex-col pt-16 sm:pt-20 px-4 pb-0">
               <div className="w-full mt-0">
                 {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
@@ -1650,4 +1642,3 @@ const SearchBar = ({
 }
 
 const processingSteps = ["Understanding Query", "Searching Knowledge Base", "Processing Data", "Generating Answer"]
-
