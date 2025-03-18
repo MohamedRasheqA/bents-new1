@@ -1438,36 +1438,16 @@ export default function ChatPage() {
               onNewConversation={handleNewConversation}
             />
 
-            {/* ChatSidebar remains unchanged */}
-            <ChatSidebar
-              isOpen={isSidebarOpen}
-              onClose={() => setIsSidebarOpen(false)}
-              sessions={sessions}
-              currentSessionId={currentSessionId}
-              onSessionSelect={handleSessionSelect}
-              onNewConversation={handleNewConversation}
-            />
-
-            {(error || wsError) && (
-              <div className="w-full px-4 mt-20 mb-4">
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
-                  <strong className="font-bold">Error: </strong>
-                  <span className="block sm:inline">{error || wsError}</span>
-                  <button
-                    className="absolute top-0 right-0 px-4 py-3"
-                    onClick={() => {
-                      setError(null)
-                      setWsError(null)
-                    }}
-                  >
-                    <span className="sr-only">Dismiss</span>
-                    <span className="text-red-500">&times;</span>
-                  </button>
-                </div>
-              </div>
+            {/* Place the Processing Card directly after the Header */}
+            {isLoading && !isStreaming && (
+              <ProcessingCard
+                query={processingQuery}
+                loadingProgress={loadingProgress}
+                setLoadingProgress={setLoadingProgress}
+              />
             )}
 
-            <main className={cn("relative", "flex-grow w-full", "flex flex-col", "pt-16 sm:pt-20 px-4 pb-0")}>
+            <div className="flex-grow w-full flex flex-col pt-16 sm:pt-20 px-4 pb-0">
               <div className="w-full mt-0">
                 {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
                   // Initial questions view (only show if no conversations exist)
@@ -1515,7 +1495,7 @@ export default function ChatPage() {
                   renderConversations()
                 )}
               </div>
-            </main>
+            </div>
 
             {!showInitialQuestions && (
               <div className="fixed bottom-0 left-0 right-0 bg-white border-t pb-0 mt-0">
