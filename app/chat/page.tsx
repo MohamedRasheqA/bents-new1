@@ -1440,7 +1440,7 @@ export default function ChatPage() {
             />
 
             {/* Increase top padding for mobile to prevent content from hiding behind header */}
-            <div className="flex-grow w-full flex flex-col pt-36 sm:pt-20 px-4 pb-0">
+            <div className="flex-grow w-full flex flex-col pt-30 sm:pt-20 px-4 pb-0">
               <div className="w-full mt-0">
                 {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
                   // Initial questions view (only show if no conversations exist)
