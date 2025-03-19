@@ -444,7 +444,7 @@ const ProcessingCard = ({
   }, [loadingProgress, setLoadingProgress])
 
   return (
-    <div ref={loadingCardRef} className="w-full bg-white rounded-lg p-6 mb-4 mt-10 sm:mt-0">
+    <div ref={loadingCardRef} className="w-full bg-white rounded-lg p-6 mb-4 mt-7 sm:mt-0">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Processing Your Query</h2>
@@ -1444,7 +1444,7 @@ export default function ChatPage() {
               <div className="w-full mt-0">
                 {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
                   // Initial questions view (only show if no conversations exist)
-                  <div className="w-full min-h-[calc(100vh-280px)] sm:min-h-[calc(100vh-240px)] flex flex-col items-center justify-center pt-12 sm:pt-0">
+                  <div className="w-full min-h-[calc(100vh-240px)] sm:min-h-[calc(100vh-240px)] flex flex-col items-center justify-center">
                     <div className="text-center mb-8">
                       <h1 className="text-2xl font-semibold text-gray-900">A question creates knowledge</h1>
                     </div>
