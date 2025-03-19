@@ -444,7 +444,7 @@ const ProcessingCard = ({
   }, [loadingProgress, setLoadingProgress])
 
   return (
-    <div ref={loadingCardRef} className="w-full bg-white rounded-lg p-6 mb-4 mt-6 sm:mt-0">
+    <div ref={loadingCardRef} className="w-full bg-white rounded-lg p-6 mb-4 mt-0">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Processing Your Query</h2>
@@ -1060,9 +1060,9 @@ export default function ChatPage() {
       <div className="relative" key="conversations-container">
         <div
           ref={containerRef}
-          className="w-full overflow-y-auto scrollbar-none mt-6 sm:mt-0"
+          className="w-full overflow-y-auto scrollbar-none mt-0"
           style={{
-            height: "calc(100vh - 200px)", // Increase height calculation to account for header
+            height: "calc(100vh - 160px)",
             paddingBottom: "0px",
             msOverflowStyle: "none",
             scrollbarWidth: "none",
@@ -1427,7 +1427,7 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#F8F9FA]">
       {/* Fixed Header - Always visible */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-white border-b">
+      <div className="fixed top-0 left-0 right-0 z-10 bg-white border-b shadow-sm">
         <Header
           userId={userId || null}
           username={username}
@@ -1437,14 +1437,32 @@ export default function ChatPage() {
           onNewConversation={handleNewConversation}
         />
       </div>
+      
+      {/* Fixed input area at the bottom */}
+      {!showInitialQuestions && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-10 shadow-sm">
+          <div className="w-full mx-auto">
+            <SearchBar
+              loading={isLoading}
+              searchQuery={searchQuery}
+              processingQuery={processingQuery}
+              onSearch={handleSearch}
+              onNewConversation={handleNewConversation}
+              setSearchQuery={setSearchQuery}
+              className="py-3"
+              isLarge={true}
+            />
+          </div>
+        </div>
+      )}
 
-      {/* Scrollable Content Area with proper spacing to avoid header overlap */}
-      <div className="flex-1 pt-20"> {/* Adjust this padding-top based on your header height */}
+      {/* Scrollable Content Area with proper spacing to avoid header and search bar overlap */}
+      <div className="flex-1" style={{ paddingTop: "76px", paddingBottom: !showInitialQuestions ? "80px" : "0px" }}>
         <div className="w-full h-full flex flex-col">
           <div 
             className="flex-1 w-full px-4 overflow-hidden"
             style={{ 
-              height: currentConversation.length === 0 && showInitialQuestions ? 'calc(100vh - 240px)' : 'calc(100vh - 140px)'
+              height: currentConversation.length === 0 && showInitialQuestions ? 'calc(100vh - 100px)' : 'calc(100vh - 156px)'
             }}
           >
             {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
@@ -1491,175 +1509,23 @@ export default function ChatPage() {
             ) : (
               // Scrollable conversation container
               <div className="h-full relative" key="conversations-container">
-                <div
-                  ref={containerRef}
-                  className="w-full h-full overflow-y-auto scrollbar-none"
-                  style={{
-                    msOverflowStyle: "none",
-                    scrollbarWidth: "none",
-                  }}
-                >
-                  <style jsx global>{`
-                    div::-webkit-scrollbar {
-                      display: none;
-                    }
-                  `}</style>
-
-                  {/* Map over completed conversations */}
-                  {currentConversation.map((conv, index) => (
-                    <ConversationItem
-                      key={`conv-${conv.id}-${index}`}
-                      conv={conv}
-                      index={index}
-                      isLatest={conv.id === currentConversation[currentConversation.length - 1]?.id}
-                    />
-                  ))}
-
-                  {/* Processing Card */}
-                  {isLoading && !isStreaming && (
-                    <ProcessingCard
-                      query={processingQuery}
-                      loadingProgress={loadingProgress}
-                      setLoadingProgress={setLoadingProgress}
-                    />
-                  )}
-
-                  {/* Single container for both streaming and processing states */}
-                  {(isStreaming || isSecondResponseLoading) &&
-                    messages.length > 0 &&
-                    !currentConversation.find((conv) => conv.question === processingQuery) && (
-                      <div key={`streaming-${messages[messages.length - 1].id}`} className="w-full bg-white rounded-lg shadow-sm p-6 mb-4 mt-0">
-                        <div className="mb-3 pb-3 border-b">
-                          <div className="flex items-center gap-2">
-                            <p className="text-gray-800 break-words font-bold" style={{ fontFamily: systemFontFamily }}>
-                              {processingQuery}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="prose prose-sm max-w-none mb-3">
-                          <div className="text-base leading-relaxed" style={{ fontFamily: systemFontFamily }}>
-                            <FixedMarkdownRenderer
-                              key={`markdown-${messages[messages.length - 1].id}`}
-                              content={messages[messages.length - 1].content}
-                            />
-                          </div>
-                        </div>
-
-                        {isSecondResponseLoading && (
-                          <div className="w-full">
-                            <div className="mt-3">
-                              <div className="bg-white rounded-lg p-4 mb-3">
-                                <div className="space-y-4">
-                                  {/* Video skeleton loader */}
-                                  <div>
-                                    <div className="flex items-center gap-3 mb-3">
-                                      <div className="animate-pulse w-8 h-8 rounded-full bg-[rgba(23,155,215,255)]/20 flex items-center justify-center">
-                                        <svg
-                                          className="w-4 h-4 text-[rgba(23,155,215,255)]"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                          stroke="currentColor"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                                          />
-                                        </svg>
-                                      </div>
-                                      <h3 className="text-base font-medium text-gray-900">Processing Related Videos</h3>
-                                    </div>
-                                    <div className="flex overflow-x-auto space-x-4">
-                                      {[1, 2].map((i) => (
-                                        <div key={i} className="flex-none w-[280px] bg-white border rounded-lg overflow-hidden">
-                                          <div className="aspect-video w-full bg-gray-200 animate-pulse" />
-                                          <div className="p-3">
-                                            <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
-                                            <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-
-                                  {/* Products skeleton loader */}
-                                  <div>
-                                    <div className="flex items-center gap-3 mb-3">
-                                      <div className="animate-pulse w-8 h-8 rounded-full bg-[rgba(23,155,215,255)]/20 flex items-center justify-center">
-                                        <svg
-                                          className="w-4 h-4 text-[rgba(23,155,215,255)]"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                          stroke="currentColor"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                                          />
-                                        </svg>
-                                      </div>
-                                      <h3 className="text-base font-medium text-gray-900">Finding Related Products</h3>
-                                    </div>
-                                    <div className="flex overflow-x-auto space-x-4">
-                                      {[1, 2, 3].map((i) => (
-                                        <div key={i} className="flex-none min-w-[180px] bg-white border rounded-lg px-4 py-3">
-                                          <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
-                                          <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                  {/* Scroll button */}
-                  {showScrollButton && (isStreaming || isSecondResponseLoading) && (
-                    <button
-                      onClick={scrollToBottom}
-                      type="button"
-                      className="fixed bottom-24 right-8 bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition-colors z-50 flex items-center gap-2"
-                    >
-                      <ArrowDown className="w-5 h-5" />
-                      <span className="text-sm font-medium pr-2">New content</span>
-                    </button>
-                  )}
-                </div>
+                {renderConversations()}
               </div>
             )}
           </div>
-
-          {/* Fixed input area at the bottom */}
-          {!showInitialQuestions && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-10">
-              <div className="w-full mx-auto">
-                <SearchBar
-                  loading={isLoading}
-                  searchQuery={searchQuery}
-                  processingQuery={processingQuery}
-                  onSearch={handleSearch}
-                  onNewConversation={handleNewConversation}
-                  setSearchQuery={setSearchQuery}
-                  className="py-6"
-                  isLarge={true}
-                />
-              </div>
+          
+          {/* The bottom SearchBar for initial questions view */}
+          {currentConversation.length === 0 && showInitialQuestions && (
+            <div className="w-full max-w-2xl mx-auto mt-auto">
+              {/* This SearchBar is only shown on the initial questions view */}
             </div>
           )}
+
         </div>
       </div>
     </div>
   )
 }
-
 // SearchBar Component
 const SearchBar = ({
   loading,
