@@ -618,188 +618,6 @@ const ChatSidebar = ({
   )
 }
 
-// Create a dedicated ConversationArea component
-const ConversationArea = ({
-  currentConversation,
-  isLoading,
-  isStreaming,
-  processingQuery,
-  loadingProgress,
-  setLoadingProgress,
-  messages,
-  isSecondResponseLoading,
-  showScrollButton,
-  scrollToBottom,
-}: {
-  currentConversation: Conversation[]
-  isLoading: boolean
-  isStreaming: boolean
-  processingQuery: string
-  loadingProgress: number
-  setLoadingProgress: React.Dispatch<React.SetStateAction<number>>
-  messages: any[]
-  isSecondResponseLoading: boolean
-  showScrollButton: boolean
-  scrollToBottom: () => void
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const messageId = messages.length > 0 ? messages[messages.length - 1].id : "default"
-
-  // Auto-scroll effect
-  useEffect(() => {
-    if (!containerRef.current || !isStreaming) return
-
-    containerRef.current.scrollTo({
-      top: containerRef.current.scrollHeight,
-      behavior: "smooth",
-    })
-  }, [isStreaming, messages])
-
-  return (
-    <div
-      className="conversation-area w-full overflow-y-auto scrollbar-none"
-      ref={containerRef}
-      style={{
-        height: "calc(100vh - 140px)", // Height calculation to fit between header and search bar
-        paddingBottom: "80px", // Add padding to prevent content from being hidden behind search bar
-        msOverflowStyle: "none",
-        scrollbarWidth: "none",
-      }}
-    >
-      <style jsx global>{`
-        .conversation-area::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-
-      {/* Map over completed conversations */}
-      {currentConversation.map((conv, index) => (
-        <ConversationItem
-          key={`conv-${conv.id}-${index}`}
-          conv={conv}
-          index={index}
-          isLatest={conv.id === currentConversation[currentConversation.length - 1]?.id}
-        />
-      ))}
-
-      {/* Processing Card */}
-      {isLoading && !isStreaming && (
-        <ProcessingCard
-          query={processingQuery}
-          loadingProgress={loadingProgress}
-          setLoadingProgress={setLoadingProgress}
-        />
-      )}
-
-      {/* Single container for both streaming and processing states */}
-      {(isStreaming || isSecondResponseLoading) &&
-        messages.length > 0 &&
-        !currentConversation.find((conv) => conv.question === processingQuery) && (
-          <div key={`streaming-${messageId}`} className="w-full bg-white rounded-lg shadow-sm p-6 mb-4 mt-0">
-            <div className="mb-3 pb-3 border-b">
-              <div className="flex items-center gap-2">
-                <p className="text-gray-800 break-words font-bold" style={{ fontFamily: systemFontFamily }}>
-                  {processingQuery}
-                </p>
-              </div>
-            </div>
-
-            <div className="prose prose-sm max-w-none mb-3">
-              <div className="text-base leading-relaxed" style={{ fontFamily: systemFontFamily }}>
-                <FixedMarkdownRenderer key={`markdown-${messageId}`} content={messages[messages.length - 1].content} />
-              </div>
-            </div>
-
-            {isSecondResponseLoading && (
-              <div className="w-full">
-                <div className="mt-3">
-                  <div className="bg-white rounded-lg p-4 mb-3">
-                    <div className="space-y-4">
-                      {/* Video skeleton loader */}
-                      <div>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="animate-pulse w-8 h-8 rounded-full bg-[rgba(23,155,215,255)]/20 flex items-center justify-center">
-                            <svg
-                              className="w-4 h-4 text-[rgba(23,155,215,255)]"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                              />
-                            </svg>
-                          </div>
-                          <h3 className="text-base font-medium text-gray-900">Processing Related Videos</h3>
-                        </div>
-                        <div className="flex overflow-x-auto space-x-4">
-                          {[1, 2].map((i) => (
-                            <div key={i} className="flex-none w-[280px] bg-white border rounded-lg overflow-hidden">
-                              <div className="aspect-video w-full bg-gray-200 animate-pulse" />
-                              <div className="p-3">
-                                <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
-                                <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Products skeleton loader */}
-                      <div>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="animate-pulse w-8 h-8 rounded-full bg-[rgba(23,155,215,255)]/20 flex items-center justify-center">
-                            <svg
-                              className="w-4 h-4 text-[rgba(23,155,215,255)]"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                              />
-                            </svg>
-                          </div>
-                          <h3 className="text-base font-medium text-gray-900">Finding Related Products</h3>
-                        </div>
-                        <div className="flex overflow-x-auto space-x-4">
-                          {[1, 2, 3].map((i) => (
-                            <div key={i} className="flex-none min-w-[180px] bg-white border rounded-lg px-4 py-3">
-                              <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
-                              <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-      {/* Scroll button */}
-      {showScrollButton && (isStreaming || isSecondResponseLoading) && (
-        <button
-          onClick={scrollToBottom}
-          type="button"
-          className="fixed bottom-24 right-8 bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition-colors z-50 flex items-center gap-2"
-        >
-          <ArrowDown className="w-5 h-5" />
-          <span className="text-sm font-medium pr-2">New content</span>
-        </button>
-      )}
-    </div>
-  )
-}
-
 // Main Chat Page Component
 export default function ChatPage() {
   const { user } = useUser()
@@ -951,6 +769,7 @@ export default function ChatPage() {
   const currentQuestionRef = useRef<string>("")
 
   // Add new refs and state for scrolling
+  const containerRef = useRef<HTMLDivElement>(null)
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [userHasScrolled, setUserHasScrolled] = useState(false)
@@ -1061,7 +880,7 @@ export default function ChatPage() {
 
   // Add check if near bottom function
   const checkIfNearBottom = useCallback(() => {
-    const container = document.querySelector(".conversation-area")
+    const container = containerRef.current
     if (!container) return true
 
     const threshold = 100 // pixels from bottom
@@ -1070,7 +889,7 @@ export default function ChatPage() {
   }, [])
 
   const handleScroll = useCallback(() => {
-    const container = document.querySelector(".conversation-area")
+    const container = containerRef.current
     if (!container) return
 
     // Detect if user is scrolling up
@@ -1084,22 +903,22 @@ export default function ChatPage() {
     lastScrollPosition.current = container.scrollTop
   }, [checkIfNearBottom])
 
-  const scrollToBottom = useCallback(() => {
-    const conversationArea = document.querySelector(".conversation-area")
-    if (!conversationArea) return
-
-    conversationArea.scrollTo({
-      top: conversationArea.scrollHeight,
-      behavior: "smooth",
-    })
+  const scrollToBottom = () => {
+    const container = containerRef.current
+    if (!container) return
 
     setIsAutoScrollEnabled(true)
     setUserHasScrolled(false)
-  }, [])
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth",
+    })
+  }
 
   // Add these useEffects:
   useEffect(() => {
-    const container = document.querySelector(".conversation-area")
+    const container = containerRef.current
     if (!container || !isStreaming || !isAutoScrollEnabled) return
 
     container.scrollTo({
@@ -1109,7 +928,7 @@ export default function ChatPage() {
   }, [isStreaming, isAutoScrollEnabled])
 
   useEffect(() => {
-    const container = document.querySelector(".conversation-area")
+    const container = containerRef.current
     if (!container) return
 
     container.addEventListener("scroll", handleScroll, { passive: true })
@@ -1232,6 +1051,213 @@ export default function ChatPage() {
       </div>
     </div>
   )
+
+  // Replace the existing renderConversations function
+  const renderConversations = () => {
+    const messageId = messages.length > 0 ? messages[messages.length - 1].id : "default"
+
+    return (
+      <div className="relative" key="conversations-container">
+        <div
+          ref={containerRef}
+          className="w-full overflow-y-auto scrollbar-none mt-6 sm:mt-0"
+          style={{
+            height: "calc(100vh - 200px)", // Increase height calculation to account for header
+            paddingBottom: "0px",
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+          }}
+        >
+          <style jsx global>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+
+          {/* Map over completed conversations */}
+          {currentConversation.map((conv, index) => (
+            <ConversationItem
+              key={`conv-${conv.id}-${index}`}
+              conv={conv}
+              index={index}
+              isLatest={conv.id === currentConversation[currentConversation.length - 1]?.id}
+            />
+          ))}
+
+          {/* Processing Card */}
+          {isLoading && !isStreaming && (
+            <ProcessingCard
+              query={processingQuery}
+              loadingProgress={loadingProgress}
+              setLoadingProgress={setLoadingProgress}
+            />
+          )}
+
+          {/* Single container for both streaming and processing states */}
+          {(isStreaming || isSecondResponseLoading) &&
+            messages.length > 0 &&
+            !currentConversation.find((conv) => conv.question === processingQuery) && (
+              <div key={`streaming-${messageId}`} className="w-full bg-white rounded-lg shadow-sm p-6 mb-4 mt-0">
+                <div className="mb-3 pb-3 border-b">
+                  <div className="flex items-center gap-2">
+                    <p className="text-gray-800 break-words font-bold" style={{ fontFamily: systemFontFamily }}>
+                      {processingQuery}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="prose prose-sm max-w-none mb-3">
+                  <div className="text-base leading-relaxed" style={{ fontFamily: systemFontFamily }}>
+                    <FixedMarkdownRenderer
+                      key={`markdown-${messageId}`}
+                      content={messages[messages.length - 1].content}
+                    />
+                  </div>
+                </div>
+
+                {isSecondResponseLoading && (
+                  <div className="w-full">
+                    <div className="mt-3">
+                      <div className="bg-white rounded-lg p-4 mb-3">
+                        <div className="space-y-4">
+                          {/* Video skeleton loader */}
+                          <div>
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="animate-pulse w-8 h-8 rounded-full bg-[rgba(23,155,215,255)]/20 flex items-center justify-center">
+                                <svg
+                                  className="w-4 h-4 text-[rgba(23,155,215,255)]"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              </div>
+                              <h3 className="text-base font-medium text-gray-900">Processing Related Videos</h3>
+                            </div>
+                            <div className="flex overflow-x-auto space-x-4">
+                              {[1, 2].map((i) => (
+                                <div key={i} className="flex-none w-[280px] bg-white border rounded-lg overflow-hidden">
+                                  <div className="aspect-video w-full bg-gray-200 animate-pulse" />
+                                  <div className="p-3">
+                                    <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
+                                    <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Products skeleton loader */}
+                          <div>
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="animate-pulse w-8 h-8 rounded-full bg-[rgba(23,155,215,255)]/20 flex items-center justify-center">
+                                <svg
+                                  className="w-4 h-4 text-[rgba(23,155,215,255)]"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                  />
+                                </svg>
+                              </div>
+                              <h3 className="text-base font-medium text-gray-900">Finding Related Products</h3>
+                            </div>
+                            <div className="flex overflow-x-auto space-x-4">
+                              {[1, 2, 3].map((i) => (
+                                <div key={i} className="flex-none min-w-[180px] bg-white border rounded-lg px-4 py-3">
+                                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
+                                  <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+          {/* Scroll button remains unchanged */}
+          {showScrollButton && (isStreaming || isSecondResponseLoading) && (
+            <button
+              onClick={scrollToBottom}
+              type="button"
+              className="fixed bottom-24 right-8 bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition-colors z-50 flex items-center gap-2"
+            >
+              <ArrowDown className="w-5 h-5" />
+              <span className="text-sm font-medium pr-2">New content</span>
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Effects
+  useEffect(() => {
+    const handleWebSocketError = (event: Event) => {
+      const customError = {
+        type: "WebSocketError",
+        originalMessage: event instanceof ErrorEvent ? event.message : "Unknown error",
+        timestamp: new Date().toISOString(),
+      }
+
+      console.error("WebSocket error:", customError)
+      setWsError(customError.originalMessage)
+      setIsStreaming(false)
+      setLoadingProgress(0)
+    }
+
+    window.addEventListener("websocketerror", handleWebSocketError)
+    return () => window.removeEventListener("websocketerror", handleWebSocketError)
+  }, [])
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
+  useEffect(() => {
+    const selectedSession = sessions.find((session) => session.id === currentSessionId)
+    if (selectedSession) {
+      setCurrentConversation(selectedSession.conversations)
+      setShowInitialQuestions(selectedSession.conversations.length === 0)
+    }
+  }, [sessions, currentSessionId])
+
+  useEffect(() => {
+    if (isLoading && loadingProgress < 3) {
+      const timer = setTimeout(() => {
+        setLoadingProgress((prev) => Math.min(prev + 1, 3))
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, loadingProgress])
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await axios.get("/api/random")
+        setRandomQuestions(response.data.map((q: any) => q.question_text))
+      } catch (error) {
+        console.error("Error fetching questions:", error)
+      }
+    }
+
+    fetchQuestions()
+  }, [])
 
   // Handlers
   const handleQuestionSelect = (question: string, index: number) => {
@@ -1399,8 +1425,9 @@ export default function ChatPage() {
 
   // Main render
   return (
-    <>
-    <div className="fixed top-0 left-0 right-0 z-20 bg-white shadow-sm">
+    <div className="flex flex-col min-h-screen bg-[#F8F9FA]">
+      {/* Fixed Header - Always visible */}
+      <div className="fixed top-0 left-0 right-0 z-10 bg-white border-b">
         <Header
           userId={userId || null}
           username={username}
@@ -1410,24 +1437,210 @@ export default function ChatPage() {
           onNewConversation={handleNewConversation}
         />
       </div>
-    <div className="flex flex-col min-h-screen bg-[#F8F9FA]">
-      {/* Header - Fixed at the top */}
-      
 
-      {/* Main content area - Starts below header with proper spacing */}
-      <div className="flex-grow mt-16">
-        {" "}
-        {/* Changed pt-16 to mt-16 for better spacing */}
-        {/* Conversation area */}
-        <div className="w-full h-full px-4">
-          {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
-            // Initial questions view (only show if no conversations exist)
-            <div className="w-full min-h-[calc(100vh-180px)] flex flex-col items-center justify-center pt-8 sm:pt-4">
-              <div className="text-center mb-8">
-                <h1 className="text-2xl font-semibold text-gray-900">A question creates knowledge</h1>
+      {/* Scrollable Content Area with proper spacing to avoid header overlap */}
+      <div className="flex-1 pt-20"> {/* Adjust this padding-top based on your header height */}
+        <div className="w-full h-full flex flex-col">
+          <div 
+            className="flex-1 w-full px-4 overflow-hidden"
+            style={{ 
+              height: currentConversation.length === 0 && showInitialQuestions ? 'calc(100vh - 240px)' : 'calc(100vh - 140px)'
+            }}
+          >
+            {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
+              // Initial questions view (only show if no conversations exist)
+              <div className="w-full h-full flex flex-col items-center justify-center pt-8 sm:pt-0">
+                <div className="text-center mb-8">
+                  <h1 className="text-2xl font-semibold text-gray-900">A question creates knowledge</h1>
+                </div>
+
+                <div className="w-full max-w-2xl mx-auto mb-12">
+                  <SearchBar
+                    loading={isLoading}
+                    searchQuery={searchQuery}
+                    processingQuery={processingQuery}
+                    onSearch={handleSearch}
+                    onNewConversation={handleNewConversation}
+                    setSearchQuery={setSearchQuery}
+                  />
+                </div>
+
+                <div className="w-full max-w-2xl grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mx-auto px-2">
+                  {randomQuestions.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleQuestionSelect(question, index)}
+                      disabled={isLoading && loadingQuestionIndex === index}
+                      className={cn(
+                        "flex items-center",
+                        "border rounded-xl shadow-sm hover:bg-[#F9FAFB]",
+                        "ring-offset-background transition-colors",
+                        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                        "w-full p-4 text-left",
+                        "bg-transparent",
+                        isLoading && loadingQuestionIndex === index
+                          ? "opacity-70 cursor-not-allowed"
+                          : "cursor-pointer",
+                      )}
+                    >
+                      <span className="text-sm text-gray-900">{question}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
+            ) : (
+              // Scrollable conversation container
+              <div className="h-full relative" key="conversations-container">
+                <div
+                  ref={containerRef}
+                  className="w-full h-full overflow-y-auto scrollbar-none"
+                  style={{
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
+                  }}
+                >
+                  <style jsx global>{`
+                    div::-webkit-scrollbar {
+                      display: none;
+                    }
+                  `}</style>
 
-              <div className="w-full max-w-2xl mx-auto mb-12">
+                  {/* Map over completed conversations */}
+                  {currentConversation.map((conv, index) => (
+                    <ConversationItem
+                      key={`conv-${conv.id}-${index}`}
+                      conv={conv}
+                      index={index}
+                      isLatest={conv.id === currentConversation[currentConversation.length - 1]?.id}
+                    />
+                  ))}
+
+                  {/* Processing Card */}
+                  {isLoading && !isStreaming && (
+                    <ProcessingCard
+                      query={processingQuery}
+                      loadingProgress={loadingProgress}
+                      setLoadingProgress={setLoadingProgress}
+                    />
+                  )}
+
+                  {/* Single container for both streaming and processing states */}
+                  {(isStreaming || isSecondResponseLoading) &&
+                    messages.length > 0 &&
+                    !currentConversation.find((conv) => conv.question === processingQuery) && (
+                      <div key={`streaming-${messages[messages.length - 1].id}`} className="w-full bg-white rounded-lg shadow-sm p-6 mb-4 mt-0">
+                        <div className="mb-3 pb-3 border-b">
+                          <div className="flex items-center gap-2">
+                            <p className="text-gray-800 break-words font-bold" style={{ fontFamily: systemFontFamily }}>
+                              {processingQuery}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="prose prose-sm max-w-none mb-3">
+                          <div className="text-base leading-relaxed" style={{ fontFamily: systemFontFamily }}>
+                            <FixedMarkdownRenderer
+                              key={`markdown-${messages[messages.length - 1].id}`}
+                              content={messages[messages.length - 1].content}
+                            />
+                          </div>
+                        </div>
+
+                        {isSecondResponseLoading && (
+                          <div className="w-full">
+                            <div className="mt-3">
+                              <div className="bg-white rounded-lg p-4 mb-3">
+                                <div className="space-y-4">
+                                  {/* Video skeleton loader */}
+                                  <div>
+                                    <div className="flex items-center gap-3 mb-3">
+                                      <div className="animate-pulse w-8 h-8 rounded-full bg-[rgba(23,155,215,255)]/20 flex items-center justify-center">
+                                        <svg
+                                          className="w-4 h-4 text-[rgba(23,155,215,255)]"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                          stroke="currentColor"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <h3 className="text-base font-medium text-gray-900">Processing Related Videos</h3>
+                                    </div>
+                                    <div className="flex overflow-x-auto space-x-4">
+                                      {[1, 2].map((i) => (
+                                        <div key={i} className="flex-none w-[280px] bg-white border rounded-lg overflow-hidden">
+                                          <div className="aspect-video w-full bg-gray-200 animate-pulse" />
+                                          <div className="p-3">
+                                            <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
+                                            <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  {/* Products skeleton loader */}
+                                  <div>
+                                    <div className="flex items-center gap-3 mb-3">
+                                      <div className="animate-pulse w-8 h-8 rounded-full bg-[rgba(23,155,215,255)]/20 flex items-center justify-center">
+                                        <svg
+                                          className="w-4 h-4 text-[rgba(23,155,215,255)]"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                          stroke="currentColor"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <h3 className="text-base font-medium text-gray-900">Finding Related Products</h3>
+                                    </div>
+                                    <div className="flex overflow-x-auto space-x-4">
+                                      {[1, 2, 3].map((i) => (
+                                        <div key={i} className="flex-none min-w-[180px] bg-white border rounded-lg px-4 py-3">
+                                          <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
+                                          <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                  {/* Scroll button */}
+                  {showScrollButton && (isStreaming || isSecondResponseLoading) && (
+                    <button
+                      onClick={scrollToBottom}
+                      type="button"
+                      className="fixed bottom-24 right-8 bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition-colors z-50 flex items-center gap-2"
+                    >
+                      <ArrowDown className="w-5 h-5" />
+                      <span className="text-sm font-medium pr-2">New content</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Fixed input area at the bottom */}
+          {!showInitialQuestions && (
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-10">
+              <div className="w-full mx-auto">
                 <SearchBar
                   loading={isLoading}
                   searchQuery={searchQuery}
@@ -1435,67 +1648,15 @@ export default function ChatPage() {
                   onSearch={handleSearch}
                   onNewConversation={handleNewConversation}
                   setSearchQuery={setSearchQuery}
+                  className="py-6"
+                  isLarge={true}
                 />
               </div>
-
-              <div className="w-full max-w-2xl grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mx-auto px-2">
-                {randomQuestions.map((question, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleQuestionSelect(question, index)}
-                    disabled={isLoading && loadingQuestionIndex === index}
-                    className={cn(
-                      "flex items-center",
-                      "border rounded-xl shadow-sm hover:bg-[#F9FAFB]",
-                      "ring-offset-background transition-colors",
-                      "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-                      "w-full p-4 text-left",
-                      "bg-transparent",
-                      isLoading && loadingQuestionIndex === index ? "opacity-70 cursor-not-allowed" : "cursor-pointer",
-                    )}
-                  >
-                    <span className="text-sm text-gray-900">{question}</span>
-                  </button>
-                ))}
-              </div>
             </div>
-          ) : (
-            // Conversation view - now using our new component
-            <ConversationArea
-              currentConversation={currentConversation}
-              isLoading={isLoading}
-              isStreaming={isStreaming}
-              processingQuery={processingQuery}
-              loadingProgress={loadingProgress}
-              setLoadingProgress={setLoadingProgress}
-              messages={messages}
-              isSecondResponseLoading={isSecondResponseLoading}
-              showScrollButton={showScrollButton}
-              scrollToBottom={scrollToBottom}
-            />
           )}
         </div>
       </div>
-
-      {/* Search bar - Fixed at the bottom */}
-      {!showInitialQuestions && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-10">
-          <div className="w-full mx-auto">
-            <SearchBar
-              loading={isLoading}
-              searchQuery={searchQuery}
-              processingQuery={processingQuery}
-              onSearch={handleSearch}
-              onNewConversation={handleNewConversation}
-              setSearchQuery={setSearchQuery}
-              className="py-4"
-              isLarge={true}
-            />
-          </div>
-        </div>
-      )}
     </div>
-    </>
   )
 }
 
@@ -1630,4 +1791,3 @@ const SearchBar = ({
 }
 
 const processingSteps = ["Understanding Query", "Searching Knowledge Base", "Processing Data", "Generating Answer"]
-

@@ -44,19 +44,17 @@ export default function Home() {
 
   return (
     <>
-      <div className="mobile-visible">
-        <Header 
-          sessions={sessions}
-          currentSessionId={currentSessionId}
-          onSessionSelect={handleSessionSelect}
-          onNewConversation={handleNewConversation}
-          userId={userId}
-          username={username}
-        />
-        <Section1 onStartChatting={handleStartChatting} isSignedIn={isSignedIn} />
-        <Footer />
-        <AmplitudeAnalytics />
-      </div>
+      <Header 
+        sessions={sessions}
+        currentSessionId={currentSessionId}
+        onSessionSelect={handleSessionSelect}
+        onNewConversation={handleNewConversation}
+        userId={userId}
+        username={username}
+      />
+      <Section1 onStartChatting={handleStartChatting} isSignedIn={isSignedIn} />
+      <Footer />
+      <AmplitudeAnalytics />
     </>
   );
 }
