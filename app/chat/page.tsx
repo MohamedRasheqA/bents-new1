@@ -1062,8 +1062,8 @@ export default function ChatPage() {
           ref={containerRef}
           className="w-full overflow-y-auto scrollbar-none mt-6 sm:mt-0"
           style={{
-            height: "calc(100vh - 140px)", // Reduce from 200px to 140px to eliminate the gap
-            paddingBottom: "80px", // Add bottom padding to ensure content doesn't get cut off
+            height: "calc(100vh - 200px)", // Increase height calculation to account for header
+            paddingBottom: "0px",
             msOverflowStyle: "none",
             scrollbarWidth: "none",
           }}
@@ -1429,17 +1429,9 @@ export default function ChatPage() {
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0">
           <div className="min-h-screen">
-            <Header
-              userId={userId || null}
-              username={username}
-              sessions={sessions}
-              currentSessionId={currentSessionId}
-              onSessionSelect={handleSessionSelect}
-              onNewConversation={handleNewConversation}
-            />
 
-            {/* Increase top padding only for mobile to prevent content from hiding behind header */}
-            <div className="flex-grow w-full flex flex-col pt-28 sm:pt-20 px-4 pb-16">
+            {/* Increase top padding for mobile to prevent content from hiding behind header */}
+            <div className="flex-grow w-full flex flex-col pt-28 sm:pt-20 px-4 pb-0">
               <div className="w-full mt-0">
                 {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
                   // Initial questions view (only show if no conversations exist)
@@ -1490,7 +1482,7 @@ export default function ChatPage() {
             </div>
 
             {!showInitialQuestions && (
-              <div className="fixed bottom-0 left-0 right-0 bg-white border-t pb-0 mt-0 z-10">
+              <div className="fixed bottom-0 left-0 right-0 bg-white border-t pb-0 mt-0">
                 <div className="w-full mx-auto px-0">
                   <SearchBar
                     loading={isLoading}
@@ -1499,7 +1491,7 @@ export default function ChatPage() {
                     onSearch={handleSearch}
                     onNewConversation={handleNewConversation}
                     setSearchQuery={setSearchQuery}
-                    className="py-4"
+                    className="py-6"
                     isLarge={true}
                   />
                 </div>
@@ -1642,4 +1634,3 @@ const SearchBar = ({
 }
 
 const processingSteps = ["Understanding Query", "Searching Knowledge Base", "Processing Data", "Generating Answer"]
-
