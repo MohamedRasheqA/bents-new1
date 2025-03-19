@@ -1399,9 +1399,8 @@ export default function ChatPage() {
 
   // Main render
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8F9FA]">
-      {/* Header - Fixed at the top */}
-      <div className="fixed top-0 left-0 right-0 z-20 bg-white shadow-sm">
+    <>
+    <div className="fixed top-0 left-0 right-0 z-20 bg-white shadow-sm">
         <Header
           userId={userId || null}
           username={username}
@@ -1411,6 +1410,9 @@ export default function ChatPage() {
           onNewConversation={handleNewConversation}
         />
       </div>
+    <div className="flex flex-col min-h-screen bg-[#F8F9FA]">
+      {/* Header - Fixed at the top */}
+      
 
       {/* Main content area - Starts below header with proper spacing */}
       <div className="flex-grow mt-16">
@@ -1493,6 +1495,7 @@ export default function ChatPage() {
         </div>
       )}
     </div>
+    </>
   )
 }
 
