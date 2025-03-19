@@ -1,3 +1,4 @@
+
 "use client"
 
 import type React from "react"
@@ -444,7 +445,7 @@ const ProcessingCard = ({
   }, [loadingProgress, setLoadingProgress])
 
   return (
-    <div ref={loadingCardRef} className="w-full bg-white rounded-lg p-6 mb-4 mt-6 sm:mt-0">
+    <div ref={loadingCardRef} className="w-full bg-white rounded-lg p-6 mb-4 mt-0">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Processing Your Query</h2>
@@ -1060,9 +1061,9 @@ export default function ChatPage() {
       <div className="relative" key="conversations-container">
         <div
           ref={containerRef}
-          className="w-full overflow-y-auto scrollbar-none mt-6 sm:mt-0"
+          className="w-full overflow-y-auto scrollbar-none mt-0"
           style={{
-            height: "calc(100vh - 200px)", // Increase height calculation to account for header
+            height: "calc(100vh - 160px)",
             paddingBottom: "0px",
             msOverflowStyle: "none",
             scrollbarWidth: "none",
@@ -1429,13 +1430,21 @@ export default function ChatPage() {
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0">
           <div className="min-h-screen">
+            <Header
+              userId={userId || null}
+              username={username}
+              sessions={sessions}
+              currentSessionId={currentSessionId}
+              onSessionSelect={handleSessionSelect}
+              onNewConversation={handleNewConversation}
+            />
 
-            {/* Increase top padding for mobile to prevent content from hiding behind header */}
-            <div className="flex-grow w-full flex flex-col pt-28 sm:pt-20 px-4 pb-0">
+            {/* Only render ProcessingCard in renderConversations */}
+            <div className="flex-grow w-full flex flex-col pt-16 sm:pt-20 px-4 pb-0">
               <div className="w-full mt-0">
                 {currentConversation.length === 0 && showInitialQuestions && !isStreaming && !isLoading ? (
                   // Initial questions view (only show if no conversations exist)
-                  <div className="w-full min-h-[calc(100vh-240px)] flex flex-col items-center justify-center pt-8 sm:pt-0">
+                  <div className="w-full min-h-[calc(100vh-200px)] flex flex-col items-center justify-center">
                     <div className="text-center mb-8">
                       <h1 className="text-2xl font-semibold text-gray-900">A question creates knowledge</h1>
                     </div>
