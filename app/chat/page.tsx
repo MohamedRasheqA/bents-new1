@@ -1427,10 +1427,7 @@ export default function ChatPage() {
   // Main render
   return (
     <div className="flex flex-col min-h-screen bg-[#F8F9FA]">
-      <div className="fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="min-h-screen">
-            <Header
+      <Header
               userId={userId || null}
               username={username}
               sessions={sessions}
@@ -1438,6 +1435,10 @@ export default function ChatPage() {
               onSessionSelect={handleSessionSelect}
               onNewConversation={handleNewConversation}
             />
+      <div className="fixed inset-0 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="min-h-screen">
+            
 
             {/* Only render ProcessingCard in renderConversations */}
             <div className="flex-grow w-full flex flex-col pt-16 sm:pt-20 px-4 pb-0">
